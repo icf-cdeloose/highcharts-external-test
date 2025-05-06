@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Highcharts CSV Test</title>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/data.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+</head>
+<body>
+  <div id="container" style="width: 600px; height: 400px;"></div>
+
+  <script>
+    Highcharts.chart('container', {
+      chart: {
+        type: 'column'
+      },
+      title: {
+        text: 'Fruit Consumption (CSV)'
+      },
+      data: {
+        csvURL: 'csv/drata.csv'
+      },
+      yAxis: {
+        title: {
+          text: 'Quantity'
+        }
+      },
+      plotOptions: {
+        series: {
+          borderWidth: 0
+        }
+      }
+    });
+  </script>
+</body>
+</html>
