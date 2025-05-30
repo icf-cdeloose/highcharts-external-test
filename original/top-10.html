@@ -1,0 +1,292 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Untitled Document</title>
+</head>
+
+<body>
+<figure class="highcharts-figure">
+<div id="imports_by_port_container" data-highcharts-chart="0" aria-hidden="false" role="region" aria-label="Top Ten US Ports of HFC Entry by Chemical or Blend for 2023. Highcharts interactive chart." style="overflow: hidden;"></div>
+
+<p class="highcharts-description highcharts-linked-description" aria-hidden="true">This stacked bar chart shows the top ten US Ports of Entry for each HFC or HFC Blend in metric tons (MT) and metric tons carbon dioxide equivalent (MTCO₂e).</p>
+
+<div><button class="usa-button styled-button active" id="imports-by-port-chart-button1">MT</button><button class="usa-button styled-button" id="imports-by-port-chart-button2">MTCO₂e</button></div>
+</figure>
+	
+<script src="https://code.highcharts.com/11.4.8/highcharts.js"></script>
+<script src="https://code.highcharts.com/11.4.8/highcharts-more.js"></script>
+
+<script src="https://code.highcharts.com/maps/11.4.8/modules/map.js"></script>
+<script src="https://code.highcharts.com/maps/11.4.8/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/maps/11.4.8/modules/data.js"></script>
+<script src="https://code.highcharts.com/11.4.8/modules/treemap.js"></script>
+<script src="https://code.highcharts.com/11.4.8/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/11.4.8/themes/high-contrast-light.js"></script>
+
+<script src="https://code.highcharts.com/maps/11.4.8/modules/offline-exporting.js"></script>
+<script src="https://code.highcharts.com/maps/11.4.8/modules/accessibility.js"></script>
+	<script>
+const portOfEntry = [
+  "Jacksonville, FL",
+  "Tampa, FL",
+  "Charleston, SC",
+  "Houston, TX",
+  "Laredo, TX",
+  "Los Angeles/Long Beach, CA",
+  "Miami, FL",
+  "New York/Newark, NJ",
+  "Norfolk/Newport News, VA",
+  "Savannah, GA"
+];
+const imports_by_port_data_mt = { // MT
+  categories: portOfEntry,
+  seriesData: [
+    [1534.7, null, 2323.9, 267.9, 60.0, null, 1578.1, 48.5, 1050.1, 4742.9],
+    [null, 5700.0, null, null, null, 100.0, null, null, null, null],
+    [null, null, 95.2, 1151.6, 10.6, null, 114.7, 698.7, 535.4, 323.3],
+    [null, null, 3187.0, 318.4, 749.2, null, null, 5724.2, 1418.6, 1136.9],
+    [null, null, 570.3, 775.8, 216.7, 485.9, 43.5, 871.1, 648.6, 807.8],
+    [null, null, 1112.5, 217.2, 75.0, 15.0, null, 190.0, null, null],
+    [null, null, 5.8, 151.5, 0.2, null, null, 50.6, 0.0, 0.5],
+    [null, null, 77.5, null, null, null, null, 10.5, null, null],
+    [null, null, 1.7, 2.3, 0.6, 12.5, null, null, null, null],
+    [null, null, 12.5, 185.1, null, null, 34.8, 81.6, 17.8, 9.0],
+    [null, null, 477.5, 2054.5, 113.9, 248.6, 255.0, 622.3, null, 144.6],
+    [null, null, 898.6, null, null, null, null, null, null, null],
+    [null, null, null, 2357.2, 318.3, null, null, 3110.5, 515.1, 6773.1],
+    [null, null, null, 33.8, null, 25.6, null, 43.0, 1.3, 0.9],
+    [null, null, null, 2960.6, 5.5, 35.0, null, 14.0, null, null],
+    [null, null, null, 16.8, null, null, null, 2.6, null, null],
+    [null, null, null, 11.5, null, null, null, 18.0, null, null],
+    [null, null, null, null, null, 800.0, 336.5, null, null, 334.6],
+    [null, null, null, null, null, null, null, 20.8, null, null],
+    [null, null, null, null, null, null, null, 121.0, null, null],
+    [null, null, null, null, null, 8.4, null, 414.0, 20.1, null],
+    [null, null, null, null, null, null, null, 32.0, 25.3, null],
+    [null, null, null, null, 0.1, null, null, 0.0, null, null],
+    [null, null, null, 0.1, null, null, null, 0.2, null, null],
+    [null, null, null, 1.1, 3.6, null, null, null, null, null],
+    [null, null, null, 243.2, null, null, null, null, null, null],
+    [null, null, null, 294.8, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, 0.0, null],
+    [null, null, null, null, null, null, null, null, null, 397.8],
+    [null, null, null, null, 3.4, null, null, null, null, null],
+    [null, null, null, null, 0.1, null, 6.9, null, 63.3, null],
+    [null, null, null, null, null, null, null, null, 0.3, null],
+    [null, null, null, null, 0.2, null, null, null, null, null],
+  ]
+};
+
+const imports_by_port_data_mtco2e = { // MTCO2e
+  categories: portOfEntry,
+  seriesData: [
+    [1035902.2, null, 1568599.0, 180832.5, 40500.0, null, 1065209.4, 32737.9, 708805.8, 3201437.8],
+    [null, 18180150.0, null, null, null, 318950.0, null, null, null, null],
+    [null, null, 198730, 2506937, 9385.7, null, 235478, 1477514, 1154800, 447193],
+    [null, null, 11154570.0, 1114295.0, 2622112.1, null, null, 20034711.9, 4965100.0, 3979150.0],
+    [null, null, 815460.7, 1109335.4, 309878.2, 694842.7, 62233.6, 1245649.1, 927549.2, 1155211.2],
+    [null, null, 4972875.0, 970884.0, 335250.0, 67050.0, null, 849300.0, null, null],
+    [null, null, 18737.2, 487891.8, 724.5, null, null, 162969.7, 25.8, 1738.8],
+    [null, null, 760275.0, null, null, null, null, 103030.5, null, null],
+    [null, null, 6839.3, 9164.8, 2258.8, 49094.5, null, null, null, null],
+    [null, null, 22249.4, 328286.4, null, null, 61737.1, 144778.1, 31621.5, 16035.6],
+    [null, null, 996784.4, 4288831.4, 237714.7, 518994.9, 532274.0, 1299042.0, null, 301936.0],
+    [null, null, 417916.4, null, null, null, null, null, null, null],
+    [null, null, null, 292289.9, 39471.2, null, null, 385697.5, 63868.3, 839866.9],
+    [null, null, null, 499546.5, null, 378369.7, null, 635961.6, 19347.9, 13391.5],
+    [null, null, null, 3049432.4, 5695.9, 36050.0, null, 14420.0, null, null],
+    [null, null, null, 1541.9, null, null, null, 243.5, null, null],
+    [null, null, null, 24285.3, null, null, null, 37926.0, null, null],
+    [null, null, null, null, null, 1783000.0, 750018.9, null, null, 745717.5],
+    [null, null, null, null, null, null, null, 28471.3, null, null],
+    [null, null, null, null, null, null, null, 96042.2, null, null],
+    [null, null, null, null, null, 13776.0, null, 678960.0, 32964.0, null],
+    [null, null, null, null, null, null, null, 80819.2, 63928.0, null],
+    [null, null, null, null, 175.9, null, null, 26.5, null, null],
+    [null, null, null, 87.3, null, null, null, 119.7, null, null],
+    [null, null, null, 1460.6, 4976.4, null, null, null, null, null],
+    [null, null, null, 429330.7, null, null, null, null, null, null],
+    [null, null, null, 486464.4, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, 49.3, null],
+    [null, null, null, null, null, null, null, null, null, 1046347.5],
+    [null, null, null, null, 6090.0, null, null, null, null, null],
+    [null, null, null, null, 135.9, null, 15736.7, null, 143293.4, null],
+    [null, null, null, null, null, null, null, null, 1774.5, null],
+    [null, null, null, null, 95.0, null, null, null, null, null],
+  ]
+};
+
+    function getSortedData(dataSet) {
+        // Calculate total volume for each port
+        const totalVolumes = dataSet.seriesData[0].map((_, i) => 
+            dataSet.seriesData.reduce((acc, curr) => acc + (curr[i] || 0), 0)
+        );
+
+        // Create an array of ports with their total volumes
+        const portsWithVolumes = portOfEntry.map((port, index) => ({
+            port,
+            totalVolume: totalVolumes[index]
+        }));
+
+        // Sort the ports by total volume in descending order
+        portsWithVolumes.sort((a, b) => b.totalVolume - a.totalVolume);
+
+        // Get the sorted port names and the corresponding sorted data
+        const sortedPorts = portsWithVolumes.map(entry => entry.port);
+        const sortedSeriesData = dataSet.seriesData.map(series =>
+            portsWithVolumes.map(entry => series[portOfEntry.indexOf(entry.port)])
+        );
+
+        return { sortedPorts, sortedSeriesData };
+    }
+
+    // Use the mapped series names from the raw data
+    
+    
+    // Use the mapped series names from the raw data
+    const seriesNames = [
+        "HFC-32", "R-421B", "Other HFC Blends", "HFC-125", "HFC-134a", "HFC-143a", "HFC-227ea", "HFC-236fa",
+        "R-404A", "R-407C", "R-410A", "R-454B", "HFC-152a", "HFC-23", "HFC-245fa", "HFC-41",
+        "R-407A", "R-410B", "HFC-236ea", "HFC-365mfc", "HFC-43-10mee", "R-422B", "R-449A", "R-466A", 
+        "R-448A", "R-453A", "R-458A", "R-417A", "R-421A", "R-437A", "R-438A", "R-508B", "R-513A"
+        // "Other HFC Blend"
+    ];
+
+ const hfcColors = {
+  "HFC-32":"#50EAD0",
+  "R-421B":"#534141",
+  "Other HFC Blend":"#b8a090",
+  "HFC-125":"#283D73", //"#d28fc5",
+  "HFC-134a":"#99C750",
+  "HFC-143a":"#77b6b1",
+  "HFC-227ea":"#FF6F59",
+  "HFC-236fa":"#63A46C",
+  "R-404A":"#EE8082",
+  "R-407C":"ff9c33", //"#E88D67",
+  "R-410A":"#05307e",
+  "R-454B":"#ff76b5",
+  "HFC-152a":"#C5EBC3",
+  "HFC-23":"#fecfe2",
+  "HFC-245fa":"#540B0E",
+  "HFC-41":"#A31621",
+  "R-407A":"#66CED6",
+  "R-410B":"#FAD201",
+  "HFC-236ea":"#A790A5",
+  "HFC-365mfc":"#9ea705",
+  "HFC-43-10mee":"#AFF8D7",
+  "R-422B":"#d55e5e", //"#7eced5",
+  "R-449A":"#C4C49E",
+  "R-466A":"#e8b0d6",
+  "R-448A":"#C5C392",
+  "R-453A":"#5ADA9B",
+  "R-458A":"33ff3f", //"#8ecbe2",
+  "R-417A":"#d4e2d1",
+  "R-421A":"#75d0c8",
+  "R-437A":"3377ff", //"#2fe7c0",
+  "R-438A":"#38ecf4", //"#283D73"
+  "R-508B":"#172494",
+  "R-513A":"#ff3333" //"#38ecf4"
+  // "Other HFC Blend": "#1A704C" 
+};
+
+    // Create initial chart with imports_by_port_data_mt
+    let { sortedPorts, sortedSeriesData } = getSortedData(imports_by_port_data_mt);
+
+    const imports_by_port_chart = Highcharts.chart('imports_by_port_container', {
+        chart: {
+            height: 600,
+            type: 'column',
+animation: false
+        },
+        title: {
+            text: 'Top Ten US Ports of HFC Entry by Chemical or Blend for 2023',
+            align: 'left',
+            subtitle: {
+                text: 'Quantities of the Top Ten US Ports of HFC Entry by Chemical or Blend.'
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        xAxis: {
+            categories: sortedPorts,
+            title: {
+                text: 'Port of Entry',
+            },
+            accessibility: {
+                description: sortedPorts.join(', ')
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Quantity Imported (MT)'
+            },
+            accessibility: {
+                description: 'Amount Imported by metric tons and/or metric tons CO2 equivalent.'
+            },
+            stackLabels: {
+                enabled: true,
+                formatter: function () {
+                    return Highcharts.numberFormat(this.total, 0, '.', ',');
+                }
+            },
+        },
+        legend: {
+            verticalAlign: 'bottom',
+            backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        tooltip: {
+            headerFormat: '<b>{point.x}</b><br/>',
+            pointFormat: '{series.name}: {point.y:,0f}<br/>Total: {point.stackTotal:,0f}'
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true,
+                    formatter: function () {
+                        return Highcharts.numberFormat(this.y, 0, '.', ',');
+                    }
+                }
+            }
+        },
+        series: sortedSeriesData.map((data, index) => ({
+            name: seriesNames[index], // Correctly map the pollutant names to each series
+            data: data,
+            color: hfcColors[seriesNames[index]] // Use the hfcColors mapping for colors
+}))
+
+    });
+
+    // Function to update the chart with sorted data when switching between datasets
+    function updateChart(dataSet) {
+        const { sortedPorts, sortedSeriesData } = getSortedData(dataSet);
+        imports_by_port_chart.xAxis[0].setCategories(sortedPorts, false);
+        sortedSeriesData.forEach((data, i) => imports_by_port_chart.series[i].setData(data, false));
+        imports_by_port_chart.redraw();
+    }
+
+    // Event listeners for buttons to switch between datasets
+    document.getElementById('imports-by-port-chart-button1').addEventListener('click', function () {
+        imports_by_port_chart.yAxis[0].setTitle({ text: 'Quantity Imported (MT)' });
+        updateChart(imports_by_port_data_mt);
+        document.getElementById('imports-by-port-chart-button2').classList.remove('active');
+        this.classList.add('active');
+    });
+
+    document.getElementById('imports-by-port-chart-button2').addEventListener('click', function () {
+        imports_by_port_chart.yAxis[0].setTitle({ text: 'Quantity Imported (MTCO₂e)' });
+        updateChart(imports_by_port_data_mtco2e);
+        document.getElementById('imports-by-port-chart-button1').classList.remove('active');
+        this.classList.add('active');
+    });
+
+		
+	</script>
+</body>
+</html>
