@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Untitled Document</title>
+</head>
+
+<body>
+
+
+
+<figure class="highcharts-figure">
+<div id="geo-container" data-highcharts-chart="8" aria-hidden="false" role="region" aria-label="Bulk HFCs by Source of Export for 2023. Highcharts interactive chart." style="overflow: hidden;"><div id="highcharts-screen-reader-region-before-8" aria-hidden="false" style="position: relative;"><div aria-hidden="false" style="position: absolute; width: 1px; height: 1px; overflow: hidden; white-space: nowrap; clip: rect(1px, 1px, 1px, 1px); margin-top: -3px; opacity: 0.01;"><h3>Bulk HFCs by Source of Export for 2023</h3><div>Bulk HFCs by Source of Export for 2023</div><div>This map shows 2023 bulk HFC imports by source of export.</div><div><button id="hc-linkto-highcharts-data-table-8" tabindex="-1" aria-expanded="false">View as data table, Bulk HFCs by Source of Export for 2023</button></div></div></div><div aria-hidden="false" class="highcharts-announcer-container" style="position: relative;"><div aria-hidden="false" aria-live="polite" aria-atomic="true" style="position: absolute; width: 1px; height: 1px; overflow: hidden; white-space: nowrap; clip: rect(1px, 1px, 1px, 1px); margin-top: -3px; opacity: 0.01;"></div><div aria-hidden="false" aria-live="assertive" aria-atomic="true" style="position: absolute; width: 1px; height: 1px; overflow: hidden; white-space: nowrap; clip: rect(1px, 1px, 1px, 1px); margin-top: -3px; opacity: 0.01;"></div><div aria-hidden="false" aria-live="polite" aria-atomic="true" style="position: absolute; width: 1px; height: 1px; overflow: hidden; white-space: nowrap; clip: rect(1px, 1px, 1px, 1px); margin-top: -3px; opacity: 0.01;"></div><div aria-hidden="false" aria-live="polite" aria-atomic="true" style="position: absolute; width: 1px; height: 1px; overflow: hidden; white-space: nowrap; clip: rect(1px, 1px, 1px, 1px); margin-top: -3px; opacity: 0.01;"></div></div><div id="highcharts-screen-reader-region-after-8" aria-hidden="false" style="position: relative;"><div aria-hidden="false" style="position: absolute; width: 1px; height: 1px; overflow: hidden; white-space: nowrap; clip: rect(1px, 1px, 1px, 1px); margin-top: -3px; opacity: 0.01;"><div id="highcharts-end-of-chart-marker-8" class="highcharts-exit-anchor" tabindex="0" aria-hidden="false">End of interactive chart.</div></div></div></div>
+</figure>
+	
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	
+	<script src="https://code.highcharts.com/11.4.8/highcharts.js"></script>
+<script src="https://code.highcharts.com/11.4.8/highcharts-more.js"></script>
+
+<script src="https://code.highcharts.com/maps/11.4.8/modules/map.js"></script>
+<script src="https://code.highcharts.com/maps/11.4.8/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/maps/11.4.8/modules/data.js"></script>
+<script src="https://code.highcharts.com/11.4.8/modules/treemap.js"></script>
+<script src="https://code.highcharts.com/11.4.8/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/11.4.8/themes/high-contrast-light.js"></script>
+
+<script src="https://code.highcharts.com/maps/11.4.8/modules/offline-exporting.js"></script>
+<script src="https://code.highcharts.com/maps/11.4.8/modules/accessibility.js"></script>
+	
+	<style>
+		table {
+    font-family: Source Sans Pro Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", "Helvetica Neue", Helvetica, Arial, sans;
+    font-size: .75rem;
+    line-height: 1.5;
+    border-collapse: collapse;
+    border-spacing: 0;
+    color: #1b1b1b;
+    margin: 1.25rem 0;
+    text-align: left;
+}
+
+table th, table td {
+    background-color: #fff;
+    border: 1px solid #1b1b1b;
+    font-weight: normal;
+    padding: .5rem 1rem;
+}
+
+tbody th {
+    background-color: #f0f0f0;
+    font-weight: 700;
+}</style>
+	
+	<script>
+  async function initChart() {
+    const year_to_use = '2023';
+
+    const csvText = await fetch('https://raw.githubusercontent.com/icf-cdeloose/highcharts-external-test/refs/heads/main/csv/assets/bulk-hfcs.csv')
+      .then(response => response.text());
+
+    const lines = csvText.trim().split('\n');
+    const rows = lines.slice(1);
+
+    const countryMap = new Map();
+
+    rows.forEach(line => {
+      const match = line.match(/(".*?"|[^,]+)(?=\s*,|\s*$)/g);
+
+      if (!match || match.length < 7) return;
+
+      const rowYear = match[0].replace(/^"|"$/g, '').trim();
+      if (rowYear !== year_to_use) return;
+
+      const countryName = match[1].replace(/^"|"$/g, '');
+      const twoLetter = match[2];
+      const threeLetter = match[3];
+      const mtValue = parseFloat(match[4]);
+      const hfcName = match[5].replace(/^"|"$/g, '');
+      const hfcQuantity = parseFloat(match[6]);
+
+      if (!countryMap.has(threeLetter)) {
+        countryMap.set(threeLetter, {
+          name: countryName,
+          source_abbrv: twoLetter,
+          GENC_3A: threeLetter,
+          value: mtValue,
+          hfcDetails: []
+        });
+      }
+
+      countryMap.get(threeLetter).hfcDetails.push({ hfcName, hfcQuantity });
+    });
+
+    const world_map_data = Array.from(countryMap.values()).map(entry => {
+  const tooltipRows = entry.hfcDetails.map(hfc =>
+    `<tr><td>${hfc.hfcName}</td><td style="text-align:right;">${hfc.hfcQuantity.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td></tr>`
+  ).join('');
+
+  const tooltip = `
+    <b>${entry.name}</b><br>
+    Total MT: ${entry.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<br><br>
+    <table>
+      <tr><th style="text-align:center;">HFC</th><th style="text-align:center;">MT</th></tr>
+      ${tooltipRows}
+    </table>
+  `.trim();
+
+  return [entry.name, entry.source_abbrv, entry.GENC_3A, entry.value, '', tooltip];
+});
+
+
+    const geojson = await fetch('https://raw.githubusercontent.com/icf-cdeloose/highcharts-external-test/refs/heads/main/csv/assets/mapcontainer.json')
+      .then(response => response.json());
+
+    Highcharts.mapChart('geo-container', {
+      chart: {
+        map: geojson,
+        animation: false,
+		  height:600
+      },
+      credits: { enabled: false },
+      title: {
+        text: `Bulk HFCs by Source of Export for ${year_to_use}`,
+        align: 'left'
+      },
+      legend: {
+        enabled: true,
+        title: {
+          text: 'MT',
+          style: { color: 'black' }
+        }
+      },
+      accessibility: {
+        typeDescription: `Bulk HFCs by Source of Export for ${year_to_use}`
+      },
+      tooltip: {
+        formatter: function () {
+          return this.point.tooltip;
+        },
+        useHTML: true
+      },
+      mapNavigation: {
+        enabled: true,
+        buttonOptions: {
+          verticalAlign: "bottom"
+        }
+      },
+      colorAxis: {
+        tickPixelInterval: 100
+      },
+      series: [{
+        data: world_map_data,
+        keys: ["name", "source_abbrv", "GENC_3A", "value", "hfcName", "tooltip"],
+        joinBy: "GENC_3A",
+        name: "",
+        dataLabels: {
+          enabled: true,
+          format: "{point.properties.source_abbrv}"
+        }
+      }]
+    });
+  }
+
+  initChart();
+</script>
+
+
+
+	
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<title>Untitled Document</title>
+</head>
+<body>
+<figure class="highcharts-figure">
+<div id="imports_by_port_container" data-highcharts-chart="0" aria-hidden="false" role="region" aria-label="Top Ten US Ports of HFC Entry by Chemical or Blend for 2023. Highcharts interactive chart." style="overflow: hidden;"></div>
+
+<p class="highcharts-description highcharts-linked-description" aria-hidden="true">This stacked bar chart shows the top ten US Ports of Entry for each HFC or HFC Blend in metric tons (MT) and metric tons carbon dioxide equivalent (MTCO₂e).</p>
+
+<div><button class="usa-button styled-button active" id="imports-by-port-chart-button1">MT</button><button class="usa-button styled-button" id="imports-by-port-chart-button2">MTCO₂e</button></div>
+</figure>
+	
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+	
+<script src="https://code.highcharts.com/11.4.8/highcharts.js"></script>
+<script src="https://code.highcharts.com/11.4.8/highcharts-more.js"></script>
+
+<script src="https://code.highcharts.com/maps/11.4.8/modules/map.js"></script>
+<script src="https://code.highcharts.com/maps/11.4.8/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/maps/11.4.8/modules/data.js"></script>
+<script src="https://code.highcharts.com/11.4.8/modules/treemap.js"></script>
+<script src="https://code.highcharts.com/11.4.8/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/11.4.8/themes/high-contrast-light.js"></script>
+
+<script src="https://code.highcharts.com/maps/11.4.8/modules/offline-exporting.js"></script>
+<script src="https://code.highcharts.com/maps/11.4.8/modules/accessibility.js"></script>
+	<script>
+const year_to_use = '2023';
+
+const portOfEntryList = [
+  "Jacksonville, FL",
+  "Tampa, FL",
+  "Charleston, SC",
+  "Houston, TX",
+  "Laredo, TX",
+  "Los Angeles/Long Beach, CA",
+  "Miami, FL",
+  "New York/Newark, NJ",
+  "Norfolk/Newport News, VA",
+  "Savannah, GA"
+];
+
+const imports_by_port_data_mt = {
+  categories: portOfEntryList,
+  seriesData: []
+};
+
+const imports_by_port_data_mtco2e = {
+  categories: portOfEntryList,
+  seriesData: []
+};
+
+const colorMap = {};
+const seriesMapMT = {};
+const seriesMapMTCO2E = {};
+
+function normalizePortName(port) {
+  if (port.includes("Jacksonville")) return "Jacksonville, FL";
+  if (port.includes("Tampa")) return "Tampa, FL";
+  if (port.includes("Charleston")) return "Charleston, SC";
+  if (port.includes("Houston")) return "Houston, TX";
+  if (port.includes("Laredo")) return "Laredo, TX";
+  if (port.includes("Los Angeles") || port.includes("Long Beach")) return "Los Angeles/Long Beach, CA";
+  if (port.includes("Miami")) return "Miami, FL";
+  if (port.includes("New York") || port.includes("Newark")) return "New York/Newark, NJ";
+  if (port.includes("Norfolk") || port.includes("Newport News")) return "Norfolk/Newport News, VA";
+  if (port.includes("Savannah")) return "Savannah, GA";
+  return null;
+}
+
+$.get('https://raw.githubusercontent.com/icf-cdeloose/highcharts-external-test/refs/heads/main/csv/assets/top-10.csv', function(data) {
+  const lines = data.trim().split('\n');
+  const headers = lines[0].split(',');
+
+  for (let i = 1; i < lines.length; i++) {
+    const row = lines[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g)?.map(field => field.replace(/^"|"$/g, '').trim());
+    if (!row || row.length < 6) continue;
+
+    const [year, portRaw, seriesName, mtStr, mtco2eStr, color] = row;
+    if (year !== year_to_use) continue;
+
+    const shortPort = normalizePortName(portRaw);
+    if (!shortPort) continue;
+
+    const idx = portOfEntryList.indexOf(shortPort);
+    if (idx === -1) continue;
+
+    const mt = parseFloat(mtStr);
+    const mtco2e = parseFloat(mtco2eStr);
+
+    if (!seriesMapMT[seriesName]) {
+      seriesMapMT[seriesName] = Array(portOfEntryList.length).fill(null);
+      seriesMapMTCO2E[seriesName] = Array(portOfEntryList.length).fill(null);
+      colorMap[seriesName] = color;
+    }
+
+    seriesMapMT[seriesName][idx] = mt;
+    seriesMapMTCO2E[seriesName][idx] = mtco2e;
+  }
+
+  for (const name in seriesMapMT) {
+    imports_by_port_data_mt.seriesData.push({
+      name,
+      data: seriesMapMT[name],
+      color: colorMap[name]
+    });
+    imports_by_port_data_mtco2e.seriesData.push({
+      name,
+      data: seriesMapMTCO2E[name],
+      color: colorMap[name]
+    });
+  }
+
+  const { sortedPorts, sortedSeriesData } = getSortedData(imports_by_port_data_mt, portOfEntryList);
+
+		// Initialize the chart
+    Highcharts.setOptions({
+        lang: {
+            thousandsSep: ','
+        }
+    });
+		
+  const imports_by_port_chart = Highcharts.chart('imports_by_port_container', {
+    chart: {
+      height: 600,
+      type: 'column'
+    },
+    title: {
+      text: `Top Ten US Ports of HFC Entry by Chemical or Blend for ${year_to_use}`,
+      align: 'left',
+      subtitle: {
+        text: 'Quantities of the Top Ten US Ports of HFC Entry by Chemical or Blend.'
+      }
+    },
+    credits: {
+      enabled: false
+    },
+    xAxis: {
+      categories: sortedPorts,
+      title: {
+        text: 'Port of Entry',
+      },
+      accessibility: {
+        description: sortedPorts.join(', ')
+      }
+    },
+    yAxis: {
+      min: 0,
+      title: {
+        text: 'Quantity Imported (MT)'
+      },
+      accessibility: {
+        description: 'Amount Imported by metric tons and/or metric tons CO2 equivalent.'
+      },
+      stackLabels: {
+        enabled: true,
+        formatter: function () {
+          return Highcharts.numberFormat(this.total, 0, '.', ',');
+        }
+      },
+    },
+    legend: {
+      verticalAlign: 'bottom',
+      backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'white',
+      borderColor: '#CCC',
+      borderWidth: 1,
+      shadow: false
+    },
+    tooltip: {
+      headerFormat: '<b>{point.x}</b><br/>',
+      pointFormat: '{series.name}: {point.y:,0f}<br/>Total: {point.stackTotal:,0f}'
+    },
+    plotOptions: {
+      column: {
+        stacking: 'normal',
+        dataLabels: {
+          enabled: true,
+          formatter: function () {
+            return Highcharts.numberFormat(this.y, 0, '.', ',');
+          }
+        }
+      }
+    },
+    series: sortedSeriesData
+  });
+
+  function getSortedData(dataSet, portList) {
+    const totalVolumes = dataSet.seriesData[0].data.map((_, i) =>
+      dataSet.seriesData.reduce((acc, curr) => acc + (curr.data[i] || 0), 0)
+    );
+
+    const portsWithVolumes = portList.map((port, index) => ({
+      port,
+      totalVolume: totalVolumes[index]
+    }));
+
+    portsWithVolumes.sort((a, b) => b.totalVolume - a.totalVolume);
+
+    const sortedPorts = portsWithVolumes.map(entry => entry.port);
+    const sortedSeriesData = dataSet.seriesData.map(series => ({
+      name: series.name,
+      color: series.color,
+      data: portsWithVolumes.map(entry => {
+        const originalIndex = portList.indexOf(entry.port);
+        return series.data[originalIndex];
+      })
+    }));
+
+    return { sortedPorts, sortedSeriesData };
+  }
+
+  function updateChart(imports_by_port_data) {
+    const { sortedPorts, sortedSeriesData } = getSortedData(imports_by_port_data, portOfEntryList);
+    imports_by_port_chart.xAxis[0].setCategories(sortedPorts, false);
+    sortedSeriesData.forEach((seriesData, i) => {
+      if (imports_by_port_chart.series[i]) {
+        imports_by_port_chart.series[i].update({
+          name: seriesData.name,
+          color: seriesData.color,
+          data: seriesData.data
+        }, false);
+      }
+    });
+    imports_by_port_chart.redraw();
+  }
+
+  document.getElementById('imports-by-port-chart-button1').addEventListener('click', function () {
+    imports_by_port_chart.yAxis[0].setTitle({ text: 'Quantity Imported (MT)' });
+    updateChart(imports_by_port_data_mt);
+    document.getElementById('imports-by-port-chart-button2').classList.remove('active');
+    this.classList.add('active');
+  });
+
+  document.getElementById('imports-by-port-chart-button2').addEventListener('click', function () {
+    imports_by_port_chart.yAxis[0].setTitle({ text: 'Quantity Imported (MTCO₂e)' });
+    updateChart(imports_by_port_data_mtco2e);
+    document.getElementById('imports-by-port-chart-button1').classList.remove('active');
+    this.classList.add('active');
+  });
+
+});
+</script>
+
+
+</body>
+</html>
