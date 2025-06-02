@@ -32,7 +32,7 @@
 $(document).ready(function () {
   const year_to_use = "2023";
 
-  $.get('assets/consumption-allowance-expanded-hfc-data.csv', function (csvText) {
+  $.get('https://raw.githubusercontent.com/icf-cdeloose/highcharts-external-test/refs/heads/main/csv/assets/consumption-allowance-expanded-hfc-data.csv', function (csvText) {
     const lines = csvText.trim().split('\n').map(l => l.split(','));
 
     const headers = lines[0];
@@ -46,11 +46,17 @@ $(document).ready(function () {
 
     const values = {
       "Gross Production": parseFloat(unitRow[2]),
-      "Total Imports": parseFloat(unitRow[3]),
-      "Total Feedstock": parseFloat(unitRow[4]),
-      "Total Exports": parseFloat(unitRow[5]),
-      "Destruction": parseFloat(unitRow[6]),
-      "AIM Act Consumption": parseFloat(unitRow[7])
+      "New Imports": parseFloat(unitRow[3]),
+      "Used Imports": parseFloat(unitRow[4]),
+      "Total Imports": parseFloat(unitRow[3]) + parseFloat(unitRow[4]),
+      "Production for Feedstock": parseFloat(unitRow[5]),
+      "New Imports for Feedstock": parseFloat(unitRow[6]),
+      "Used Imports for Feedstock": parseFloat(unitRow[7]),
+      "Total Feedstock": parseFloat(unitRow[5]) + parseFloat(unitRow[6]) + parseFloat(unitRow[7]),
+      "New Exports": parseFloat(unitRow[8]),
+      "Used Exports": parseFloat(unitRow[9]),
+      "Total Exports": parseFloat(unitRow[8]) + parseFloat(unitRow[9]),
+      "Destruction": parseFloat(unitRow[10])
     };
 	  
 	const cap_value = 273498315;
@@ -93,8 +99,23 @@ $(document).ready(function () {
       credits: { enabled: false },
 
       tooltip: {
-        formatter: function () {
-          return this.point.name + ": " + Highcharts.numberFormat(this.y, 1, '.', ',') + " MTCO₂e";
+		formatter: function() {
+            switch(this.point.index) {
+                case 0:
+                    return "Reported Production: " + Highcharts.numberFormat(this.y, 1, '.', ',');
+                case 1:
+                    return "New Imports: " + Highcharts.numberFormat(values["New Imports"], 1, '.', ',') + "<br>Used Imports: " + Highcharts.numberFormat(values["Used Imports"], 1, '.', ',');
+                case 2:
+                    return "Production for Feedstock: " + Highcharts.numberFormat(values["Production for Feedstock"], 1, '.', ',') + "<br>New Imports for Feedstock: " + Highcharts.numberFormat(values["New Imports for Feedstock"], 1, '.', ',') + "<br>Used Imports for Feedstock:  " + Highcharts.numberFormat(values["Used Imports for Feedstock"], 1, '.', ',');
+                case 3:
+                    return "New Exports: " + Highcharts.numberFormat(values["New Exports"], 1, '.', ',') + "<br>Used Exports: " + Highcharts.numberFormat(values["Used Exports"], 1, '.', ',');
+                case 4:
+                    return "Reported Destruction: " + Highcharts.numberFormat(this.y, 1, '.', ',');
+                case 5:
+                    return "AIM Act Consumption: " + Highcharts.numberFormat(this.y, 1, '.', ',');
+                default:
+                    return this.point.name + ": " + Highcharts.numberFormat(this.y, 1, '.', ',');
+            }
         }
       },
 

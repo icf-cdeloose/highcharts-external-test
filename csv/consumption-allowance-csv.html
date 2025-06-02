@@ -61,7 +61,7 @@
 
   let dataAll = [];
 
-  $.get('assets/consumption-allowance.csv', function(csv) {
+  $.get('https://raw.githubusercontent.com/icf-cdeloose/highcharts-external-test/refs/heads/main/csv/assets/consumption-allowance.csv', function(csv) {
     const lines = csv.trim().split('\n');
     const headers = lines[0].split(',').slice(1).map(h => h.trim().replace(/^"|"$/g, '')); // skip first column (year)
 
@@ -118,7 +118,7 @@
       },
       tooltip: {
         formatter: function () {
-          return `${this.point.name}: ${formatNumber(Math.abs(this.point.y))} MTEVe`;
+          return `${this.point.name}: ${formatNumber(Math.abs(this.point.y))}`;
         }
       },
       series: [{

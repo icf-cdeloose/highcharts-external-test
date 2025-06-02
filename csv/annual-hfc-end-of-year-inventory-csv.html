@@ -34,7 +34,7 @@ let imports_by_year_weightByYears = {};
 let allHFCs = new Set(); // Will be filled dynamically from CSV
 const SeriesNameToEnd = "Other HFCs"; // Still needed for moving to end if present
 
-$.get('assets/annual-hfc-end-of-year-inventory.csv', function(data) {
+$.get('https://raw.githubusercontent.com/icf-cdeloose/highcharts-external-test/refs/heads/main/csv/assets/annual-hfc-end-of-year-inventory.csv', function(data) {
   const lines = data.trim().split('\n');
   const headers = lines[0].split(',');
 
@@ -138,8 +138,12 @@ function renderChart(dataType) {
     xAxis: { categories },
     yAxis: {
       min: 0,
-      title: { text: dataType }
+      title: { text: dataType === 'MTCO2e' ? 'MTCO₂e' : dataType,
+    useHTML: true }
     },
+      credits: {
+        enabled: false
+      },
     tooltip: {
       formatter: function () {
         const val = this.y.toLocaleString(undefined, { maximumFractionDigits: 1 });

@@ -26,16 +26,26 @@
 <script src="https://code.highcharts.com/maps/11.4.8/modules/accessibility.js"></script>
 	<script>
 // Load CSV and parse to JSON
+		const year_to_use = '2023';
+		
+		// Initialize the chart
+    Highcharts.setOptions({
+        lang: {
+            thousandsSep: ','
+        }
+    });
 async function loadTreemapDataFromCSV() {
-  const response = await fetch('assets/production-for-2023.csv');
+  const response = await fetch('https://raw.githubusercontent.com/icf-cdeloose/highcharts-external-test/refs/heads/main/csv/assets/production-for-2023.csv');
   const csvText = await response.text();
 
   const lines = csvText.trim().split('\n');
   const result = [];
 
   for (let i = 1; i < lines.length; i++) {
-    const [name, value, color] = lines[i].split(',');
-    result.push({ name: name.trim(), value: parseFloat(value), color: color.trim() });
+    const [year, name, value, color] = lines[i].split(',');
+    if (year.trim() === year_to_use) {
+      result.push({ name: name.trim(), value: parseFloat(value), color: color.trim() });
+    }
   }
 
   return result;
@@ -68,17 +78,16 @@ async function initProdTreemapChart() {
         color: prod_treemap_hfc1[i].color || '#ccc'  // Fallback color if not enough
       })),
       accessibility: {
-        description: "HFC-134a has the largest production in metric tons carbon dioxide equivalent in 2023."
+        description: `HFC-134a has the largest production in metric tons carbon dioxide equivalent in ${year_to_use}.`
       }
     }],
     title: {
-      text: 'Production for 2023 (MTCO₂e)',
+      text: `Production for ${year_to_use} (MTCO₂e)`,
       align: "left"
     }
   });
 }
 
-// Run it
 initProdTreemapChart();
 </script>
 
